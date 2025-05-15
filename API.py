@@ -6,10 +6,10 @@ import time
 import os
 
 # -----------------------------------------------------------------------------
-# 사용자가 제공한 설정값들을 그대로 사용!
+# API KEY 값과 CERT ID 값은 직접 KAMIS 홈페이지에서 요청해서 받아야함 !
 # -----------------------------------------------------------------------------
-KAMIS_API_KEY = "d26fea8f-bb17-4889-bc85-1c13ade78247"
-KAMIS_CERT_ID = "5655"
+KAMIS_API_KEY = "####"
+KAMIS_CERT_ID = "####"
 KAMIS_BASE_URL = "http://www.kamis.or.kr/service/price/xml.do"
 KAMIS_ACTION = "periodProductList"
 
@@ -28,7 +28,7 @@ TARGET_ITEMS_KAMIS = {
     },
     "양파": {
         "부류코드": "200", "품목코드": "245",
-        "품종들": [{"코드": "00", "이름": "양파(일반)"}], "우리가_쓸_대표명": "양파"
+        "품종들": [{"코드": "00", "이름": "양파(일반)"}],
     },
     "깐마늘": {
         "부류코드": "200", "품목코드": "258",
@@ -38,29 +38,29 @@ TARGET_ITEMS_KAMIS = {
     },
     "대파": {
         "부류코드": "200", "품목코드": "246",
-        "품종들": [{"코드": "00", "이름": "대파(일반)"}], "우리가_쓸_대표명": "대파"
+        "품종들": [{"코드": "00", "이름": "대파(일반)"}],
     },
     "홍고추": {
         "부류코드": "200", "품목코드": "243",
-        "품종들": [{"코드": "00", "이름": "홍고추(일반)"}], "우리가_쓸_대표명": "홍고추"
+        "품종들": [{"코드": "00", "이름": "홍고추(일반)"}],
     },
     "깻잎": {
         "부류코드": "200", "품목코드": "253",
-        "품종들": [{"코드": "00", "이름": "깻잎(일반)"}], "우리가_쓸_대표명": "깻잎"
+        "품종들": [{"코드": "00", "이름": "깻잎(일반)"}],
     },
 }
 START_DATE_REQ = "2025-01-01"
-END_DATE_REQ = "2025-04-30" # 테스트를 위해 짧게
+END_DATE_REQ = "2025-04-30"
 
 PRODUCT_CLS_CODE = '01'
 PRODUCT_RANK_CODE = '04'
 COUNTRY_CODES_TO_USE = ['1101']
 CONVERT_KG_YN = 'Y'
-OUTPUT_CSV_FILENAME_KAMIS = "kamis_prices_2025_verification_no_duplicates.csv" # 새 파일명
+OUTPUT_CSV_FILENAME_KAMIS = "kamis_prices_2025_verification_no_duplicates.csv"
 
 # API 요청 시 사용할 파라미터 이름들
-PARAM_API_KEY = 'p_cert_key' # 네 코드 기준
-PARAM_API_ID = 'p_cert_id'   # 네 코드 기준
+PARAM_API_KEY = 'p_cert_key'
+PARAM_API_ID = 'p_cert_id'  
 PARAM_RETURN_TYPE = 'p_returntype'
 PARAM_START_DAY = 'p_startday'
 PARAM_END_DAY = 'p_endday'
@@ -285,5 +285,3 @@ for main_item_name_key, item_details_value in TARGET_ITEMS_KAMIS.items():
     time.sleep(0.3) # 다음 대표 품목 처리 전 딜레이
 
 print(f"\n\n===== All KAMIS Data Collection Finished or Resumed! Total new records added this session: {total_new_records_this_session} =====")
-
-# ... (이후 최종 CSV 확인 로직은 동일) ...
