@@ -9,8 +9,8 @@ import os # 파일 존재 여부 확인을 위해 import
 # ★★★★★ 사용자가 반드시 확인하고 정확하게 수정해야 하는 부분 ★★★★★
 # 이 부분을 수정하지 않으면 코드가 제대로 작동하지 않습니다.
 # -----------------------------------------------------------------------------
-# 1. 발급받은 API 인증키
-SERVICE_KEY = "ccb968f0331e32757e63b288a8e3c1a84a65b58907184c906dc94e97abb90537"
+# 1. 발급받은 API 인증키(사용자가 직접 data.go.kr 홈페이지에서 API KEY값을 받아와야함)
+SERVICE_KEY = "####"
 BASE_URL = "http://211.237.50.150:7080/openapi/sample/xml/Grid_20240625000000000653_1"
 
 TARGET_ITEM_MAPPING = {
@@ -63,8 +63,6 @@ TAG_TOTAL_QTY = 'TOTQTY'
 # 전체 데이터를 저장할 파일명
 OUTPUT_CSV_FILENAME = f"collected_prices_{START_YEAR}_to_{END_YEAR}_all_items_markets_cumulative.csv"
 
-# 이전에 저장된 파일이 있다면, 마지막으로 처리된 품목/시장/날짜를 확인하는 로직 (선택적 고급 기능)
-# last_processed_info = load_last_progress_from_csv(OUTPUT_CSV_FILENAME) # 이런 함수를 만들어야 함
 
 def get_total_count_from_xml(xml_root):
     total_count_node = xml_root.find('.//totalCnt')
@@ -216,11 +214,7 @@ for target_item_key, item_codes in TARGET_ITEM_MAPPING.items():
 
         while current_date_obj <= end_date_obj_loop:
             date_str = current_date_obj.strftime("%Y%m%d")
-            
-            # (품목, 시장, 날짜) 조합이 이미 처리되었는지 확인 (더 정교한 중복 방지용 - 선택적)
-            # if (target_item_key, whsal_code_val, date_str) in processed_items_markets_dates:
-            #     current_date_obj += timedelta(days=1)
-            #     continue
+         
 
             # 진행 상황 간략히 표시
             if current_date_obj.day == 1: # 매월 1일이 될 때마다
