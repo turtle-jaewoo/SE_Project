@@ -8,37 +8,51 @@ def returnAveragePrice(df):
     avg = df.groupby(
         by=['MY_TARGET_ITEM_NAME','date','countyname_api'],
         sort=False
-    )['price_api'].mean().round().astype(int).reset_index()
+    )['price_api'].mean().reset_index()
+    
+    pivot_column_name = 'MY_TARGET_ITEM_NAME'
 
-    avg.rename(
-        columns={'price_api': 'avg_price'},
-        inplace=True
-        )
+    try:
+        avg = avg.pivot_table(index = ['date','countyname_api'],
+                                        columns = pivot_column_name,
+                                        values = 'price_api',
+                                        aggfunc = 'mean')
+    except KeyError as e:
+        print(f"Check Column's name")
+    except Exception as e:
+        print(f"Other error happened")
+        
+    avg.columns.name = None
+    avg = avg.reset_index()
+    avg = avg.round(2)
     
-    avg.set_index('date',inplace=True)
-    
-    return avg
+    column_order = [
+        'date',
+        'countyname_api',
+        '배추',
+        '무',
+        '마늘',
+        '양파',
+        '대파',
+        '홍고추',
+        '깻잎'
+    ]
 
-if __name__ == "__main__":
-    testCSV = "kamis_prices_2025_verification_no_duplicates.csv"
-
-    test_df = pd.read_csv(testCSV)
-    
-    
-    numOfRegion = len(test_df['countyname_api'].unique())
-    
-    test_avg_df = returnAveragePrice(test_df)
+    avg = avg[column_order]
     
     item_en = {
-        '배추': 'Cabbage',
-        '무': 'Radish',
-        '양파': 'Onion',
-        '마늘': 'Garlic',
-        '대파': 'Green Onion',
-        '홍고추': 'Red Pepper',
-        '깻잎': 'Perilla Leaf'
+        'date':'date',
+        'countyname_api':'region',
+        '배추': 'cabbage',
+        '무': 'radish',
+        '양파': 'onion',
+        '마늘': 'garlic',
+        '대파': 'daikon',
+        '홍고추': 'cilantror',
+        '깻잎': 'artichoke'
     }
-    test_avg_df['MY_TARGET_ITEM_NAME'] = test_avg_df['MY_TARGET_ITEM_NAME'].replace(item_en)
+    
+    avg.columns = avg.columns.map(item_en)
     
     region_en = {
         '서울': 'Seoul',
@@ -66,38 +80,18 @@ if __name__ == "__main__":
         '제주': 'Jeju'
     }
     
-    test_avg_df['countyname_api'] = test_avg_df['countyname_api'].replace(region_en)
+    avg['region'] = avg['region'].replace(region_en)
     
-    #print(test_avg_df.head(len(test_df['countyname_api'].unique()) * 2))
-    #print(len(test_avg_df['countyname_api'].unique()) == numOfRegion)
-    #print(test_avg_df.index.max(), test_avg_df.index.min())
+    return avg
     
+
+if __name__ == "__main__":
+    testCSV = "kamis_prices_2025_verification_no_duplicates.csv"
+
+    test_df = pd.read_csv(testCSV)
+    
+    test_avg_df = returnAveragePrice(test_df)
+
     test_avg_df.to_csv('average_price_by_dateAndRegion.csv', encoding='utf-8')
-    
-    def showGraph():
-        import matplotlib.pyplot as plt
-        
-        foodList = test_avg_df['MY_TARGET_ITEM_NAME'].unique()[0:4]
-        regionList = test_avg_df['countyname_api'].unique()[0:4]
-        
-        fig, axes = plt.subplots(len(foodList), 1, figsize=(12,12), squeeze=False)
-        
-        xticks = [test_avg_df.index.min(), test_avg_df.index.max()]
-        
-        for row ,food in enumerate(foodList):
-            ax = axes[row][0]
-            for col, region in enumerate(regionList):
-                
-                set = test_avg_df[(test_avg_df['MY_TARGET_ITEM_NAME'] == food) & (test_avg_df['countyname_api'] == region)]
-                
-                ax.plot(set.index, set['avg_price'], label=region)
-                ax.set_title(f'{food}')
-                ax.set_xticks(xticks)
-                ax.legend()
-                
-                
-        plt.tight_layout()
-        plt.show()
-    
-    showGraph()
+
 
