@@ -8,8 +8,8 @@ import os
 # -----------------------------------------------------------------------------
 # API KEY 값과 CERT ID 값은 직접 KAMIS 홈페이지에서 요청해서 받아야함 !
 # -----------------------------------------------------------------------------
-KAMIS_API_KEY = "####"
-KAMIS_CERT_ID = "####"
+KAMIS_API_KEY = "d26fea8f-bb17-4889-bc85-1c13ade78247"
+KAMIS_CERT_ID = "5655"
 KAMIS_BASE_URL = "http://www.kamis.or.kr/service/price/xml.do"
 KAMIS_ACTION = "periodProductList"
 
@@ -52,7 +52,7 @@ TARGET_ITEMS_KAMIS = {
 START_DATE_REQ = "2025-01-01"
 END_DATE_REQ = "2025-04-30"
 
-PRODUCT_CLS_CODE = '01'
+PRODUCT_CLS_CODE = '02'  # '01'은 소매, '02'는 도매, 도매 가격으로 데이터 요청
 PRODUCT_RANK_CODE = '04'
 COUNTRY_CODES_TO_USE = ['1101']
 CONVERT_KG_YN = 'Y'
