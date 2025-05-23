@@ -53,7 +53,7 @@ def plot_predictions_over_time(df, vegetables, rolling_mean_window):
     st.pyplot(fig)
 
 # 제목
-st.title('🥬🧅🧄 농산물 가격 예측 대시보드 📈')
+st.title('🥬🧅 농산물 가격 예측 대시보드 📈')
 st.markdown("왼쪽에서 품목과 예측모델, 날짜를 입력하면 특정기간 이후 예측 가격이 표시됩니다.")
 
 # 품목 한글 매핑
@@ -120,7 +120,7 @@ else:
             st.info("예측 모델이 선택되지 않았습니다.")
 
     if selected_models:
-        st.subheader('📊 선택한 예측 모델의 정확도 Summary (퍼센트)')
+        st.subheader('📊 선택한 예측 모델의 정확도 %')
 
         model_splits = [col.split('_pred_') for col in selected_models]
         selected_rows = list(set([split[0] for split in model_splits]))
