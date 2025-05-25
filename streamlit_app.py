@@ -70,6 +70,7 @@ vegetable_kor_map = {
 # ✅ 영어 (한글) 형식으로 표시
 def label_formatter(eng_key):
     return f"{eng_key} ({vegetable_kor_map[eng_key]})"
+    
 
 # 품목 및 예측 모델 목록
 product_columns = list(vegetable_kor_map.keys())
@@ -77,19 +78,64 @@ sorted_vegetables = sorted(product_columns)
 pred_model_columns = sorted([col for col in df.columns if '_pred_' in col])
 label_map = {f"{col.split('_pred_')[0]} ({col.split('_pred_')[1]})": col for col in pred_model_columns}
 
+
+
+# 라벨 맵 구성
+label_map = {f"{col.split('_pred_')[0]} ({col.split('_pred_')[1]})": col for col in pred_model_columns}
+
+
 # 사이드바 UI
 st.sidebar.title('조회 항목 설정')
-vegetables = st.sidebar.multiselect('조회 품목:', options=sorted_vegetables, format_func=label_formatter)
-selected_labels = st.sidebar.multiselect('예측 모델 선택:', list(label_map.keys()))
-selected_models = [label_map[label] for label in selected_labels]
-start_date = st.sidebar.date_input('시작일', df.index.min())
-end_date = st.sidebar.date_input('마지막일', df.index.max())
+# 1. 조회 품목 선택
+vegetables = st.sidebar.multiselect(
+    '조회 품목:', 
+    options=sorted_vegetables, 
+    format_func=label_formatter
+)
+
+# 2. 조회 품목에 맞는 예측 모델 필터링
+filtered_label_keys = [
+    label for label in label_map.keys()
+    if any(veg == label.split(' ')[0] for veg in vegetables)
+]
+
+# 3. 이전 선택 유지
+default_selected_labels = st.session_state.get('selected_labels', [])
+
+# 4. 중복 제거하며 순서 유지
+def unique_preserve_order(seq):
+    seen = set()
+    return [x for x in seq if not (x in seen or seen.add(x))]
+
+available_labels = unique_preserve_order(filtered_label_keys + default_selected_labels)
+
+# 5. 예측 모델 선택 위젯
+selected_labels = st.sidebar.multiselect(
+    '예측 모델 선택:',
+    options=available_labels,
+    default=default_selected_labels
+)
+
+# 6. 선택값 세션에 저장
+st.session_state['selected_labels'] = selected_labels
+
+# 7. 선택한 모델 컬럼명 리스트 생성
+selected_models = [label_map[label] for label in selected_labels if label in label_map]
+
+
+
+# 8. 날짜 입력
+start_date = st.sidebar.date_input('시작일', df.index.min().date())
+end_date = st.sidebar.date_input('마지막일', df.index.max().date())
+
+# 9. 롤링 윈도우 슬라이더
 rolling_mean_window = st.sidebar.slider('Rolling Mean Window', min_value=1, max_value=30, value=7)
+
 
 # 📌 초기화면: 아무것도 선택하지 않았을 때
 if not vegetables and not selected_models:
     st.info("👈 왼쪽 사이드바에서 품목과 예측 모델을 선택하세요.")
-    st.subheader("📋 전체 품목별 모델 정확도 요약")
+    st.subheader("📋 전체 품목별 모델 정확도 %")
 
     metric_percent = (metric_summary * 100).round(2)
     st.dataframe(metric_percent, use_container_width=True)
@@ -120,7 +166,7 @@ else:
             st.info("예측 모델이 선택되지 않았습니다.")
 
     if selected_models:
-        st.subheader('📊 선택한 예측 모델의 정확도 %')
+        st.subheader('📊 선택한 예측 모델의 정확도 Summary (퍼센트)')
 
         model_splits = [col.split('_pred_') for col in selected_models]
         selected_rows = list(set([split[0] for split in model_splits]))
